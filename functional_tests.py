@@ -1,5 +1,6 @@
 import unittest
 from get_html_script import scrape_site
+from bs4 import BeautifulSoup
 
 class TestScrapeMethods(unittest.TestCase):
 
@@ -15,8 +16,17 @@ class TestScrapeMethods(unittest.TestCase):
         # Phil sees that he was able to get a successful response
         self.assertEqual(results.status_code, 200)
 
+        # Phil sees that it did in fact search the site he wanted.
+        self.assertTrue(site in results.url)
+
+        # Phil sees that it definitely searched for the type of job he wanted.results
+        self.assertTrue(query in results.url)
+
+        # He also sees that it certainly searched the location he wanted.
+        self.assertTrue(location in results.url)
+
         # Phil, not being one of those computer-y types, is glad that his result does not contain any html inside of it.
-        self.assertTrue(results.data.does_not_contain_html)
+        self.assertFalse(bool(BeautifulSoup(results.content, "html.parser").find()))
 
         # Phil sees that the site did, in fact, get data from the monster job site.
         self.assertTrue(results.url.contains(site))
