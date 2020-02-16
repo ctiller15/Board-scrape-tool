@@ -9,8 +9,14 @@ class TestScrapeMethods(unittest.TestCase):
         query = 'mechanic'
         location = 'Tampa'
         site = 'https://www.monster.com'
-        #url = 'https://www.monster.com/jobs/search/?q=mechanic&where=Tampa' 
+        #url = 'https://www.monster.com/jobs/search/?q=mechanic&where=Tampa'
         results = scrape_site(site, query, location)
+
+        # Phil sees that he was able to get a successful response
+        self.assertEqual(results.status_code, 200)
+
+        # Phil, not being one of those computer-y types, is glad that his result does not contain any html inside of it.
+        self.assertTrue(results.data.does_not_contain_html)
 
         # Phil sees that the site did, in fact, get data from the monster job site.
         self.assertTrue(results.url.contains(site))
@@ -23,10 +29,10 @@ class TestScrapeMethods(unittest.TestCase):
 
         # Phil sees that the scraper can actually grab data from a site!
         self.assertNotEmpty(results.response)
-        
+
         # Amazed at how far technology has come, a satisfied Phil goes to bed.
 
-                
+
 if __name__ == '__main__':
     unittest.main()
 
