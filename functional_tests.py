@@ -25,22 +25,42 @@ class TestScrapeMethods(unittest.TestCase):
         # He also sees that it certainly searched the location he wanted.
         self.assertTrue(location in results.url)
 
-        # Phil, not being one of those computer-y types, is glad that his result does not contain any html inside of it.
+    def test_successfully_parses_data(self):
+        # Mary is a bit more discerning than Phil.
+        # She wants to make sure her data makes sense.
+
+        query = 'radiologist'
+        location = 'New York'
+        site = 'https://www.monster.com'
+
+        # Mary tries to verify some of the same stuff.
+        results = scrape_site(site, query, location)
+
+        # Mary sees that it did in fact search the site she wanted.
+        self.assertTrue(site in results.url)
+
+        # Mary sees that it definitely searched for the type of job she wanted.
+        self.assertTrue(query in results.url)
+
+        # She also sees that it certainly searched the location he wanted.
+        self.assertTrue(location in results.url)
+
+        # Mary sees that the site did, in fact, get data from the monster job site.
+        self.assertTrue(results.url.contains(site))
+        # Mary, not being one of those computer-y types, is glad that his result does not contain any html inside of it.
+
         self.assertFalse(bool(BeautifulSoup(results.content, "html.parser").find()))
 
-        # Phil sees that the site did, in fact, get data from the monster job site.
-        self.assertTrue(results.url.contains(site))
-
-        # Phil sees that he did get mechanic jobs in his results.
+        # Mary sees that she did get mechanic jobs in her results.
         self.assertTrue(results.listItems.names.contains(query))
 
-        # Phil also sees that he got results in Tampa.
+        # Mary also sees that she got results in New York.
         self.assertTrue(results.listItems.locations.any.contains(location))
 
-        # Phil sees that the scraper can actually grab data from a site!
+        # Mary sees that the scraper can actually grab data from a site!
         self.assertNotEmpty(results.response)
 
-        # Amazed at how far technology has come, a satisfied Phil goes to bed.
+        # Amazed at how far technology has come, a satisfied Mary goes to bed.
 
 
 if __name__ == '__main__':
