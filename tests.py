@@ -28,8 +28,6 @@ class TestUrlGeneration(unittest.TestCase):
         # Check that it parses the existing results correctly.
         parsed_class = sh.parse_relevant_job_data(dummy_html, site, query, location)
 
-        print(parsed_class.title)
-        print(query)
         self.assertTrue(query in parsed_class.title)
         self.assertTrue(location.lower() in parsed_class.location)
         self.assertTrue(site in parsed_class.link)
@@ -41,11 +39,17 @@ class TestUrlGeneration(unittest.TestCase):
 
         parsed_class_list = sh.parse_job_list(dummy_html_list, site, query, location)
 
-        print(parsed_class_list)
-        print(query)
-        self.assertTrue(query in all([x.title for x in parsed_class_list]))
-        self.assertTrue(location.lower() in all([x.location for x in parsed_class_list]))
-        self.assertTrue(site in all([x.link for x in parsed_class_list]))
+        self.assertTrue(all([x.title != None for x in parsed_class_list]))
+        self.assertTrue(all([x.location != None for x in parsed_class_list]))
+        self.assertTrue(all([x.link != None for x in parsed_class_list]))
+        self.assertEqual(len(parsed_class_list), len(dummy_html_list))
+
+    def test_parsing_monster_query_results_into_multiple_rows(self):
+
+        data_parsed_to_list = sh.parse_html_to_lists(dummy_html_blob)
+
+        self.assertTrue(type(data_parsed_to_list) == types.list)
+        self.assertTrue(len(data_parsed_to_list) > 1)
 
 if __name__ == '__main__':
     unittest.main()

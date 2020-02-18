@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 def scrape_site(site_name, query_text, location):
     url = sh.generate_request_url(site_name, query_text, location)
     response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    print(soup)
-    resp1 = soup.find(id='ResultsContainer')
-    print(resp1)
-    print(resp1.findall('section', class_='card-content'))
-    return response
+    first_soup = BeautifulSoup(response.content, 'html.parser')
+    parsed_data = sh.parse_job_list(str(first_soup.find('body')), site_name, query_text, location)
+    return parsed_data
+    #soup = BeautifulSoup(response.content, 'html.parser')
+    #resp1 = soup.find(id='ResultsContainer')
+    #return response
