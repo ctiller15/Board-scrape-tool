@@ -56,6 +56,15 @@ class TestUrlGeneration(unittest.TestCase):
 
         self.assertIsNone(parsed_class)
 
+    def test_parsing_multiple_rows_with_empty_rows_returns_cleared_data(self):
+        site = 'monster.com'
+        query = 'radiologist',
+        location = 'New York'
+
+        parsed_list = sh.parse_job_list(mixed_dummy_html_list, site, query, location)
+
+        self.assertTrue(len(mixed_dummy_html_list) > len(parsed_list))
+
     def test_parsing_monster_query_results_into_multiple_rows(self):
 
         data_parsed_to_list = sh.parse_html_to_lists(dummy_html_blob)
