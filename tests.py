@@ -10,6 +10,7 @@ dummy_html_list = ["""<section class="card-content" data-jobid="fe76d172-235e-4f
 
 dummy_html_blob = """<body><div id="ResultsContainer"><section class="card-content">Item1</section><section class="card-content">Item2</section>"""
 
+empty_dummy_html_list = """<section class="card-content"></section>"""
 
 class TestUrlGeneration(unittest.TestCase):
     def test_url_generation(self):
@@ -45,6 +46,19 @@ class TestUrlGeneration(unittest.TestCase):
         self.assertTrue(all([x.location != None for x in parsed_class_list]))
         self.assertTrue(all([x.link != None for x in parsed_class_list]))
         self.assertEqual(len(parsed_class_list), len(dummy_html_list))
+
+    def test_empty_result_parsing_does_not_error(self):
+        site = 'monster.com'
+        query = 'radiologist'
+        location = 'New York'
+
+        with self.assertRaises(Exception) as context:
+            parsed_class = sh.parse_relevant_job_data(empty_dummy_html_list, site, query, location)
+
+        self.assertIsNone(context.exception)
+        self.assertIsNone(parsed_class.title)
+        self.assertIsNone(parsed_class.location)
+        self.assertIsNone(parsed_class.link)
 
     def test_parsing_monster_query_results_into_multiple_rows(self):
 
