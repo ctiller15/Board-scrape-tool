@@ -47,18 +47,14 @@ class TestUrlGeneration(unittest.TestCase):
         self.assertTrue(all([x.link != None for x in parsed_class_list]))
         self.assertEqual(len(parsed_class_list), len(dummy_html_list))
 
-    def test_empty_result_parsing_does_not_error(self):
+    def test_empty_result_parsing_returns_empty(self):
         site = 'monster.com'
         query = 'radiologist'
         location = 'New York'
 
-        with self.assertRaises(Exception) as context:
-            parsed_class = sh.parse_relevant_job_data(empty_dummy_html_list, site, query, location)
+        parsed_class = sh.parse_relevant_job_data(empty_dummy_html_list, site, query, location)
 
-        self.assertIsNone(context.exception)
-        self.assertIsNone(parsed_class.title)
-        self.assertIsNone(parsed_class.location)
-        self.assertIsNone(parsed_class.link)
+        self.assertIsNone(parsed_class)
 
     def test_parsing_monster_query_results_into_multiple_rows(self):
 
