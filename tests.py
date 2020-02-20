@@ -12,6 +12,8 @@ dummy_html_blob = """<body><div id="ResultsContainer"><section class="card-conte
 
 empty_dummy_html_list = """<section class="card-content"></section>"""
 
+mixed_dummy_html_list = ["""<section class="card-content"></section>""",""" <section class="card-content"><h2 class="title">JobTitle</h2><div class="location">CoolLocation</div><a href="https://job-openings.monster.com/radiologist-body-imaging-brooklyn-ny-us-envision-physician-services-plantation-rsc/6bd5b9bb-f2af-4e9d-819a-0fd929ec8b33"></a></section>"""]
+
 class TestUrlGeneration(unittest.TestCase):
     def test_url_generation(self):
        site = 'monster.com'
