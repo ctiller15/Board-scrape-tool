@@ -31,7 +31,7 @@ class TestUrlGeneration(unittest.TestCase):
         location = 'New York'
 
         # Check that it parses the existing results correctly.
-        parsed_class = sh.parse_relevant_job_data(dummy_html, site, query, location)
+        parsed_class = sh.parse_relevant_job_data(dummy_html)
 
         self.assertTrue(query in parsed_class.title)
         self.assertTrue(location.lower() in parsed_class.location)
@@ -42,7 +42,7 @@ class TestUrlGeneration(unittest.TestCase):
         query = 'radiologist'
         location = 'New York'
 
-        parsed_class_list = sh.parse_job_list(dummy_html_list, site, query, location)
+        parsed_class_list = sh.parse_job_list(dummy_html_list)
 
         self.assertTrue(all([x.title != None for x in parsed_class_list]))
         self.assertTrue(all([x.location != None for x in parsed_class_list]))
@@ -54,7 +54,7 @@ class TestUrlGeneration(unittest.TestCase):
         query = 'radiologist'
         location = 'New York'
 
-        parsed_class = sh.parse_relevant_job_data(empty_dummy_html_list, site, query, location)
+        parsed_class = sh.parse_relevant_job_data(empty_dummy_html_list)
 
         self.assertIsNone(parsed_class)
 
@@ -63,7 +63,7 @@ class TestUrlGeneration(unittest.TestCase):
         query = 'radiologist',
         location = 'New York'
 
-        parsed_list = sh.parse_job_list(mixed_dummy_html_list, site, query, location)
+        parsed_list = sh.parse_job_list(mixed_dummy_html_list)
 
         self.assertTrue(len(mixed_dummy_html_list) > len(parsed_list))
 
