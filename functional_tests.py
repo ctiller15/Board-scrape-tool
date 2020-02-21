@@ -9,21 +9,18 @@ class TestScrapeMethods(unittest.TestCase):
         # He plans to see if it can find data on mechanics jobs, and he wants to move to tampa, so he checks monster.
         query = 'mechanic'
         location = 'Tampa'
-        site = 'https://www.monster.com'
+        site = 'monster.com'
         #url = 'https://www.monster.com/jobs/search/?q=mechanic&where=Tampa'
         results = scrape_site(site, query, location)
 
-        # Phil sees that he was able to get a successful response
-        self.assertEqual(results.status_code, 200)
-
         # Phil sees that it did in fact search the site he wanted.
-        self.assertTrue(site in results.url)
+        self.assertTrue(all([site in item.link for item in results]))
 
         # Phil sees that it definitely searched for the type of job he wanted.results
-        self.assertTrue(query in results.url)
+        self.assertTrue(any([query in item.link for item in results]))
 
         # He also sees that it certainly searched the location he wanted.
-        self.assertTrue(location in results.url)
+        self.assertTrue(any([location.lower() in item.link for item in results]))
 
     def test_successfully_parses_data(self):
         # Mary is a bit more discerning than Phil.
