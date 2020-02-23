@@ -1,5 +1,5 @@
-import models
 from bs4 import BeautifulSoup
+from models import models
 
 def generate_request_url(site, query, location):
     if 'monster' in site:

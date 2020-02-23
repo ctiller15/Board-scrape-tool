@@ -1,6 +1,11 @@
 import unittest
 from bs4 import BeautifulSoup
 import get_html_script as ghs
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 class TestScrapeMethods(unittest.TestCase):
 
@@ -76,7 +81,8 @@ class TestScrapeMethods(unittest.TestCase):
 class StoresDataAndSendsEmailTest(unittest.TestCase):
     def setUp(self):
         self.engine = create_engine('sqlite:///:memory:')
-        self.session = Session(engine)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
         Base.metadata.create_all(self.engine)
 
     def tearDown(self):
@@ -91,7 +97,7 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
         location = 'utah'
         site = 'monster.com'
 
-        class_data = ghs.get_html_script(site, query, location)
+        class_data = ghs.scrape_full_page(site, query, location)
 
         # His data is saved to the database. It is the exact same data that he had before.
         mapped_data = map_class_data_to_response_models(class_data)
