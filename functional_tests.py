@@ -73,6 +73,59 @@ class TestScrapeMethods(unittest.TestCase):
 
         # Amazed at how far technology has come, a satisfied Mary goes to bed.
 
+class StoresDataAndSendsEmailTest(unittest.TestCase):
+    def setUp(self):
+        self.engine = create_engine('sqlite:///:memory:')
+        self.session = Session(engine)
+        Base.metadata.create_all(self.engine)
+
+    def tearDown(self):
+        Base.metadata.drop_all(self.engine)
+
+
+    def test_emails_saved_job_data(self):
+        # Larry is lazy. He doesn't want to have to keep checking everything himself, so
+        # He wants the app to email him only results that haven't already been emailed to him yet.
+
+        query = 'hairdresser'
+        location = 'utah'
+        site = 'monster.com'
+
+        class_data = ghs.get_html_script(site, query, location)
+
+        # His data is saved to the database. It is the exact same data that he had before.
+        mapped_data = map_class_data_to_response_models(class_data)
+
+        for data_point in mapped_data:
+            self.session.add(data_point)
+
+        self.session.commit()
+
+        saved_data = session.query(JobDataDbModel).all()
+
+        self.assertEqual(len(class_data), len(saved_data))
+
+        # His data is safely persisted in a database. Now he expects it to email itself to him.
+
+        generated_html_email = generate_html_email_for_job_data(saved_data)
+
+        assertTrue(data.title in generated_html_email for data in saved_data)
+        assertTrue(data.location in generated_html_email for data in saved_data)
+        assertTrue(data.link in generated_html_email for data in saved_data)
+
+        # The email has all of the expected data. It gets emailed to him.
+        send_email_to_user(generated_html_email, user_email)
+
+        # Larry has received the email after a short amount of time has passed.
+        assertTrue(check_email_has_been_received())
+
+        # All of the items that were sent are now marked as having been sent.
+        # Because of this, none of them should show if we filter out sent items in the DB.
+        updated_data = session.query(JobDataDbModel).filter(sent)
+        assertTrue(len(updated_data) == 0)
+
+        # Satisfied that it works as expected, Larry goes to bed.
+
 
 if __name__ == '__main__':
     unittest.main()
