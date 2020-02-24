@@ -2,7 +2,13 @@ import unittest
 import scrape_helpers as sh
 from bs4 import BeautifulSoup
 from models import models
+from models.database_models import JobDataDbModel
 from models import domain_db_mappings as dbm
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 dummy_html = """<section class="card-content" data-jobid="bf50682c-f3b0-4b30-bd87-94682b7f38f6" onclick="MKImpressionTrackingMouseDownHijack(this, event)"><div class="flex-row"><div class="mux-company-logo thumbnail"></div><div class="summary"><header class="card-header"><h2 class="title"><a data-bypass="true" data-m_impr_a_placement_id="JSR2CW" data-m_impr_j_cid="3975" data-m_impr_j_coc="" data-m_impr_j_jawsid="419414642" data-m_impr_j_jobid="194890933" data-m_impr_j_jpm="1" data-m_impr_j_jpt="2" data-m_impr_j_lat="40.75" data-m_impr_j_lid="550" data-m_impr_j_long="-73.9967" data-m_impr_j_occid="11870" data-m_impr_j_p="1" data-m_impr_j_postingid="bf50682c-f3b0-4b30-bd87-94682b7f38f6" data-m_impr_j_pvc="pandologicpx" data-m_impr_s_t="t" data-m_impr_uuid="66592e1d-3b1b-448a-9646-b9149c2cfd42" href="https://job-openings.monster.com/neurointerventional-radiologist-new-york-ny-us-confidential/bf50682c-f3b0-4b30-bd87-94682b7f38f6" onclick="clickJobTitle('plid=550&amp;pcid=3975&amp;poccid=11870','radiologist',''); clickJobTitleSiteCat('{&quot;events.event48&quot;:&quot;true&quot;,&quot;eVar25&quot;:&quot;Neurointerventional Radiologist&quot;,&quot;eVar66&quot;:&quot;Monster&quot;,&quot;eVar67&quot;:&quot;JSR2CW&quot;,&quot;eVar26&quot;:&quot;_Confidential&quot;,&quot;eVar31&quot;:&quot;New York_NY_&quot;,&quot;prop24&quot;:&quot;2020-02-13T12:00&quot;,&quot;eVar53&quot;:&quot;2900480001001&quot;,&quot;eVar50&quot;:&quot;PPC&quot;,&quot;eVar74&quot;:&quot;regular&quot;}')">Neurointerventional Radiologist</a></h2></header><div class="company"><span class="name">Confidential</span><ul class="list-inline"></ul></div><div class="location"><span class="name">New York, NY</span></div></div><div class="meta flex-col"><time datetime="2017-05-26T12:00">3 days ago</time><span class="mux-tooltip applied-only" data-mux="tooltip" title="Applied"><i aria-hidden="true" class="icon icon-applied"></i><span class="sr-only">Applied</span></span><span class="mux-tooltip saved-only" data-mux="tooltip" title="Saved"><i aria-hidden="true" class="icon icon-saved"></i><span class="sr-only">Saved</span></span></div></div></section>
 """
@@ -16,7 +22,7 @@ empty_dummy_html_list = """<section class="card-content"></section>"""
 
 mixed_dummy_html_list = ["""<section class="card-content"></section>""",""" <section class="card-content"><h2 class="title">JobTitle</h2><div class="location">CoolLocation</div><a href="https://job-openings.monster.com/radiologist-body-imaging-brooklyn-ny-us-envision-physician-services-plantation-rsc/6bd5b9bb-f2af-4e9d-819a-0fd929ec8b33"></a></section>"""]
 
-class TestUrlGeneration(unittest.TestCase):
+class TestSiteScraper(unittest.TestCase):
     def test_url_generation(self):
        site = 'monster.com'
        query = 'mechanic'
@@ -76,6 +82,16 @@ class TestUrlGeneration(unittest.TestCase):
         self.assertTrue(isinstance(data_parsed_to_list, list))
         self.assertTrue(len(data_parsed_to_list) > 1)
 
+class TestDbInteractions(unittest.TestCase):
+    def setUp(self):
+        self.engine = create_engine('sqlite:///:memory:')
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+        Base.metadata.create_all(self.engine, tables=[JobDataDbModel.__table__])
+
+    def tearDown(self):
+        Base.metadata.drop_all(self.engine)
+
     def test_results_mapping_to_data_model(self):
         original_result = models.JobDataModel("test_title", "test_location", "test_url")
 
@@ -85,6 +101,21 @@ class TestUrlGeneration(unittest.TestCase):
         self.assertEqual(final_mapping.location, "test_location")
         self.assertEqual(final_mapping.link, "test_url")
         self.assertEqual(final_mapping.has_been_emailed, False)
+
+    def test_results_save_to_database(self):
+        model = JobDataDbModel(title="test_job", location="test_location", link="test_link", has_been_emailed=False)
+
+        self.session.add(model)
+        self.session.commit()
+
+        saved_data = self.session.query(JobDataDbModel).all()
+
+        self.assertEqual(len(saved_data), 1)
+
+        returned_row = saved_data[0]
+
+        self.assertEqual(model.id, 1)
+        self.assertTrue(model.__dict__ == returned_row.__dict__)
 
 if __name__ == '__main__':
     unittest.main()
