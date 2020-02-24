@@ -4,6 +4,8 @@ import get_html_script as ghs
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from models import domain_db_mappings as dbm
+from models.database_models import JobDataDbModel
 
 Base = declarative_base()
 
@@ -83,7 +85,7 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
         self.engine = create_engine('sqlite:///:memory:')
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-        Base.metadata.create_all(self.engine)
+        Base.metadata.create_all(self.engine, tables=[JobDataDbModel.__table__])
 
     def tearDown(self):
         Base.metadata.drop_all(self.engine)
@@ -100,14 +102,14 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
         class_data = ghs.scrape_full_page(site, query, location)
 
         # His data is saved to the database. It is the exact same data that he had before.
-        mapped_data = map_class_data_to_response_models(class_data)
+        mapped_data = dbm.map_job_data_models_to_db_models(class_data)
 
         for data_point in mapped_data:
             self.session.add(data_point)
 
         self.session.commit()
 
-        saved_data = session.query(JobDataDbModel).all()
+        saved_data = self.session.query(JobDataDbModel).all()
 
         self.assertEqual(len(class_data), len(saved_data))
 

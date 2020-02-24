@@ -8,3 +8,6 @@ def map_job_data_model_to_db(job_data_model):
     new_model.has_been_emailed = False
 
     return new_model
+
+def map_job_data_models_to_db_models(job_data_models):
+    return [map_job_data_model_to_db(model) for model in job_data_models]

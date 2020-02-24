@@ -102,6 +102,20 @@ class TestDbInteractions(unittest.TestCase):
         self.assertEqual(final_mapping.link, "test_url")
         self.assertEqual(final_mapping.has_been_emailed, False)
 
+    def test_multiple_results_mapping_to_data_model(self):
+        original_results = [models.JobDataModel("test_title_01", "test_location_01", "test_url_01"),
+                            models.JobDataModel("test_title_02", "test_location_02", "test_url_02")]
+
+        final_results = dbm.map_job_data_models_to_db_models(original_results)
+
+        self.assertEqual(len(final_results), len(original_results))
+
+        for i in range(len(original_results)):
+            self.assertNotEqual(type(original_results[i]), type(final_results[i]))
+            self.assertEqual(original_results[i].title, final_results[i].title)
+            self.assertEqual(original_results[i].location, final_results[i].location)
+            self.assertEqual(original_results[i].link, final_results[i].link)
+
     def test_results_save_to_database(self):
         model = JobDataDbModel(title="test_job", location="test_location", link="test_link", has_been_emailed=False)
 
@@ -116,6 +130,23 @@ class TestDbInteractions(unittest.TestCase):
 
         self.assertEqual(model.id, 1)
         self.assertTrue(model.__dict__ == returned_row.__dict__)
+
+    def test_multiple_results_save_to_database(self):
+        models = [JobDataDbModel(title='test_job_01', location='test_location_01', link='test_link_01', has_been_emailed=False),
+                  JobDataDbModel(title='test_job_02', location='test_location_02', link='test_link_02', has_been_emailed=False)]
+
+        for model in models:
+            self.session.add(model)
+
+        self.session.commit()
+
+        saved_data = self.session.query(JobDataDbModel).all()
+
+        self.assertEqual(len(saved_data), len(models))
+
+        for i in range(len(saved_data)):
+            self.assertEqual(models[i].id, i + 1)
+            self.assertTrue(models[i].__dict__ == saved_data[i].__dict__)
 
 if __name__ == '__main__':
     unittest.main()
