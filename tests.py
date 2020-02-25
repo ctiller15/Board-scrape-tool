@@ -7,6 +7,7 @@ from models import domain_db_mappings as dbm
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import html_generator as html_gen
 
 Base = declarative_base()
 
@@ -147,6 +148,24 @@ class TestDbInteractions(unittest.TestCase):
         for i in range(len(saved_data)):
             self.assertEqual(models[i].id, i + 1)
             self.assertTrue(models[i].__dict__ == saved_data[i].__dict__)
+
+class TestHtmlGeneration(unittest.TestCase):
+
+    def test_html_generated_for_single_class(self):
+        original_model = models.JobDataModel("title", "location", "url")
+
+        generated_row = html_gen.generate_row_from_job_data(original_model)
+
+        soup = BeautifulSoup(generated_row, 'html.parser')
+
+        title_elem = soup.find('h3')
+        location_elem = soup.find('p')
+        url_elem = soup.find('a')
+
+        self.assertTrue("title" in title_elem.text)
+        self.assertTrue("location" in location_elem.text)
+        self.assertTrue("url" in url_elem['href'])
+
 
 if __name__ == '__main__':
     unittest.main()
