@@ -6,6 +6,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from models import domain_db_mappings as dbm
 from models.database_models import JobDataDbModel
+from html_generator import generate_full_html_email
+
 
 Base = declarative_base()
 
@@ -115,22 +117,22 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         # His data is safely persisted in a database. Now he expects it to email itself to him.
 
-        generated_html_email = generate_html_email_for_job_data(saved_data)
+        generated_html_email = generate_full_html_email(saved_data)
 
-        assertTrue(data.title in generated_html_email for data in saved_data)
-        assertTrue(data.location in generated_html_email for data in saved_data)
-        assertTrue(data.link in generated_html_email for data in saved_data)
+        self.assertTrue(data.title in generated_html_email for data in saved_data)
+        self.assertTrue(data.location in generated_html_email for data in saved_data)
+        self.assertTrue(data.link in generated_html_email for data in saved_data)
 
         # The email has all of the expected data. It gets emailed to him.
         send_email_to_user(generated_html_email, user_email)
 
         # Larry has received the email after a short amount of time has passed.
-        assertTrue(check_email_has_been_received())
+        self.assertTrue(check_email_has_been_received())
 
         # All of the items that were sent are now marked as having been sent.
         # Because of this, none of them should show if we filter out sent items in the DB.
         updated_data = session.query(JobDataDbModel).filter(sent)
-        assertTrue(len(updated_data) == 0)
+        self.assertTrue(len(updated_data) == 0)
 
         # Satisfied that it works as expected, Larry goes to bed.
 

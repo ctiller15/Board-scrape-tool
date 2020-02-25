@@ -194,13 +194,11 @@ class TestHtmlGeneration(unittest.TestCase):
         generated_html = html_gen.generate_full_html_email(starter_models)
 
         soup = BeautifulSoup(generated_html, 'html.parser')
-
-        table_nested_rows = soup.find('tr').find_children('tr')
+        table_nested_rows = soup.find('tr').find('td').find('table').find_all('tr', recursive=False)
 
         self.assertEqual(len(table_nested_rows), 3)
 
         # Should contain a header, a body, and a footer
-
         header_element = table_nested_rows[0].find('td', class_='header_content')
 
         body_element = table_nested_rows[1].find('td', class_='body_content')
@@ -208,10 +206,10 @@ class TestHtmlGeneration(unittest.TestCase):
         footer_element = table_nested_rows[2].find('td', class_='footer_content')
 
         self.assertTrue(header_element.text.strip())
-        self.assertEqual(len(body_element.findall('tr')), len(starter_models))
+        self.assertEqual(len(body_element.find_all('td')), len(starter_models))
 
-        for elem in body_element.findall('tr'):
-            self.AssertTrue(elem.text.strip())
+        for elem in body_element.find_all('tr'):
+            self.assertTrue(elem.text.strip())
 
         self.assertTrue(footer_element.text.strip())
 
