@@ -186,6 +186,35 @@ class TestHtmlGeneration(unittest.TestCase):
             self.assertTrue(original_models[i].location in location_elem.text)
             self.assertEqual(original_models[i].link, url_elem['href'])
 
+    def test_creates_full_html_email_document(self):
+        starter_models = [models.JobDataModel("cool job", "alberquerque", "coolurl.com/jobs/cool_job"),
+                          models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
+                          models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
+
+        generated_html = html_gen.generate_full_html_email(starter_models)
+
+        soup = BeautifulSoup(generated_html, 'html.parser')
+
+        table_nested_rows = soup.find('tr').find_children('tr')
+
+        self.assertEqual(len(table_nested_rows), 3)
+
+        # Should contain a header, a body, and a footer
+
+        header_element = table_nested_rows[0].find('td', class_='header_content')
+
+        body_element = table_nested_rows[1].find('td', class_='body_content')
+
+        footer_element = table_nested_rows[2].find('td', class_='footer_content')
+
+        self.assertTrue(header_element.text.strip())
+        self.assertEqual(len(body_element.findall('tr')), len(starter_models))
+
+        for elem in body_element.findall('tr'):
+            self.AssertTrue(elem.text.strip())
+
+        self.assertTrue(footer_element.text.strip())
+
 
 if __name__ == '__main__':
     unittest.main()
