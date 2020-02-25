@@ -8,3 +8,6 @@ def generate_row_from_job_data(JobDataModel):
                 </td>
             </tr>
     """
+
+def generate_rows_from_job_data_list(JobDataModels):
+    return [generate_row_from_job_data(model) for model in JobDataModels]

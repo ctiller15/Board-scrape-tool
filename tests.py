@@ -162,9 +162,29 @@ class TestHtmlGeneration(unittest.TestCase):
         location_elem = soup.find('p')
         url_elem = soup.find('a')
 
-        self.assertTrue("title" in title_elem.text)
-        self.assertTrue("location" in location_elem.text)
-        self.assertTrue("url" in url_elem['href'])
+        self.assertEqual(original_model.title, title_elem.text)
+        self.assertTrue(original_model.location in location_elem.text)
+        self.assertEqual(original_model.link, url_elem['href'])
+
+    def test_html_generated_for_multiple_classes(self):
+        original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
+                           models.JobDataModel("title_02", "location_02", "url_02")]
+
+        generated_rows = html_gen.generate_rows_from_job_data_list(original_models)
+
+        for i in range(len(original_models)):
+
+            soup = BeautifulSoup(generated_rows[i], 'html.parser')
+
+            html_row = soup.find('tr')
+
+            title_elem = html_row.find('h3')
+            location_elem = html_row.find('p')
+            url_elem = html_row.find('a')
+
+            self.assertEqual(original_models[i].title, title_elem.text)
+            self.assertTrue(original_models[i].location in location_elem.text)
+            self.assertEqual(original_models[i].link, url_elem['href'])
 
 
 if __name__ == '__main__':
