@@ -249,6 +249,20 @@ class TestEmailGeneration(unittest.TestCase):
 
         self.assertTrue(footer_element.text.strip())
 
+class TestFormatHelpers(unittest.TestCase):
+
+    def test_formats_datetime_for_Americas(self):
+        current_date = datetime.today()
+
+        formatted_date = fh.format_date(current_date)
+
+        split_date = formatted_date.split("/")
+
+        self.assertEqual(current_date.day, split_date[0])
+        self.assertEqual(current_date.day_num, split_date[1])
+        self.assertEqual(current_date.month, split_date[2])
+        self.assertEqual(current_date.year, split_date[3])
+
 
 if __name__ == '__main__':
     unittest.main()
