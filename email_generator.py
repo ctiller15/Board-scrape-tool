@@ -1,4 +1,4 @@
-def generate_row_from_job_data(JobDataModel):
+def generate_html_row_from_job_data(JobDataModel):
     return f"""
             <tr>
                 <td>
@@ -9,8 +9,8 @@ def generate_row_from_job_data(JobDataModel):
             </tr>
     """
 
-def generate_rows_from_job_data_list(JobDataModels):
-    return [generate_row_from_job_data(model) for model in JobDataModels]
+def generate_html_rows_from_job_data_list(JobDataModels):
+    return [generate_html_row_from_job_data(model) for model in JobDataModels]
 
 def generate_full_html_email(JobDataModels):
     html_email_markup = f"""
@@ -35,7 +35,7 @@ def generate_full_html_email(JobDataModels):
                                     <tr>
                                         <td class="body_content" style="padding: 30px">
                                             <table border="1" cellpadding="0" cellspacing="0" width="100%">
-                                                {"".join(generate_rows_from_job_data_list(JobDataModels))}
+                                                {"".join(generate_html_rows_from_job_data_list(JobDataModels))}
                                             </table>
                                         </td>
                                     </tr>

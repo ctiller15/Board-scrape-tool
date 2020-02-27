@@ -7,7 +7,7 @@ from models import domain_db_mappings as dbm
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-import html_generator as html_gen
+import email_generator as email_gen
 
 Base = declarative_base()
 
@@ -149,12 +149,48 @@ class TestDbInteractions(unittest.TestCase):
             self.assertEqual(models[i].id, i + 1)
             self.assertTrue(models[i].__dict__ == saved_data[i].__dict__)
 
-class TestHtmlGeneration(unittest.TestCase):
+class TestEmailGeneration(unittest.TestCase):
 
-    def test_html_generated_for_single_class(self):
+    def test_text_email_generated_for_single_class(self):
         original_model = models.JobDataModel("title", "location", "url")
 
-        generated_row = html_gen.generate_row_from_job_data(original_model)
+        generated_row = email_gen.generate_text_row_from_job_data(original_model)
+
+        self.assertFalse(bool(BeautifulSoup(generated_row, 'html.parser').find()))
+
+        self.assertTrue(original_model.title in generated_row)
+        self.assertTrue(original_model.location in generated_row)
+        self.assertTrue(original_model.link in generated_row)
+
+    def test_text_email_generated_for_multiple_classes(self):
+        original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
+                           models.JobDataModel("title_02", "location_02", "url_02")]
+
+        generated_rows = email_gen.generate_text_rows_from_job_data_list(original_models)
+
+        self.assertFalse(bool(BeautifulSoup(generated_row, 'html.parser').find()))
+
+        for model in original_models:
+            self.assertTrue(model.title in generated_rows)
+            self.assertTrue(model.location in generated_rows)
+            self.assertTrue(model.link in generated_rows)
+
+    def test_creates_full_text_document(self):
+        starter_models = [models.JobDataModel("cool job", "alberquerque", "coolurl.com/jobs/cool_job"),
+                          models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
+                          models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
+
+        generated_text = email_gen.generate_full_text_email(starter_models)
+
+        for model in starter_models:
+            self.assertTrue(model.location in generated_text)
+            self.assertTrue(model.title in generated_text)
+            self.assertTrue(model.link in generated_text)
+
+    def test_html_email_generated_for_single_class(self):
+        original_model = models.JobDataModel("title", "location", "url")
+
+        generated_row = email_gen.generate_html_row_from_job_data(original_model)
 
         soup = BeautifulSoup(generated_row, 'html.parser')
 
@@ -166,11 +202,11 @@ class TestHtmlGeneration(unittest.TestCase):
         self.assertTrue(original_model.location in location_elem.text)
         self.assertEqual(original_model.link, url_elem['href'])
 
-    def test_html_generated_for_multiple_classes(self):
+    def test_html_email_generated_for_multiple_classes(self):
         original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
                            models.JobDataModel("title_02", "location_02", "url_02")]
 
-        generated_rows = html_gen.generate_rows_from_job_data_list(original_models)
+        generated_rows = email_gen.generate_html_rows_from_job_data_list(original_models)
 
         for i in range(len(original_models)):
 
@@ -191,7 +227,7 @@ class TestHtmlGeneration(unittest.TestCase):
                           models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
                           models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
 
-        generated_html = html_gen.generate_full_html_email(starter_models)
+        generated_html = email_gen.generate_full_html_email(starter_models)
 
         soup = BeautifulSoup(generated_html, 'html.parser')
         table_nested_rows = soup.find('tr').find('td').find('table').find_all('tr', recursive=False)
