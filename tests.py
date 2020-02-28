@@ -158,7 +158,7 @@ class TestEmailGeneration(unittest.TestCase):
 
         generated_header = email_gen.generate_text_email_header(current_date)
 
-        self.assertTrue(str(fh.days[current_date.weekday]) in generated_header)
+        self.assertTrue(str(fh.days[current_date.weekday()]) in generated_header)
         self.assertTrue(str(current_date.day).strip() in generated_header)
         self.assertTrue(str(current_date.month).strip() in generated_header)
         self.assertTrue(str(current_date.year).strip() in generated_header)
