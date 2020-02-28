@@ -8,6 +8,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import email_generator as email_gen
+from datetime import date
+import format_helpers as fh
 
 Base = declarative_base()
 
@@ -252,16 +254,16 @@ class TestEmailGeneration(unittest.TestCase):
 class TestFormatHelpers(unittest.TestCase):
 
     def test_formats_datetime_for_Americas(self):
-        current_date = datetime.today()
+        current_date = date.today()
 
         formatted_date = fh.format_date(current_date)
 
-        split_date = formatted_date.split("/")
+        split_date = formatted_date.replace(',', '/').split("/")
 
-        self.assertEqual(current_date.day, split_date[0])
-        self.assertEqual(current_date.day_num, split_date[1])
-        self.assertEqual(current_date.month, split_date[2])
-        self.assertEqual(current_date.year, split_date[3])
+        self.assertEqual(fh.days[current_date.weekday()], split_date[0])
+        self.assertEqual(current_date.day, int(split_date[1].strip()))
+        self.assertEqual(current_date.month, int(split_date[2].strip()))
+        self.assertEqual(current_date.year, int(split_date[3].strip()))
 
 
 if __name__ == '__main__':
