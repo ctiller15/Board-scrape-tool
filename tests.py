@@ -174,13 +174,13 @@ class TestEmailGeneration(unittest.TestCase):
         self.assertTrue(original_model.location in generated_row)
         self.assertTrue(original_model.link in generated_row)
 
-    def test_text_email_generated_for_multiple_classes(self):
+    def test_text_email_rows_generated_for_multiple_classes(self):
         original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
                            models.JobDataModel("title_02", "location_02", "url_02")]
 
-        generated_rows = email_gen.generate_text_rows_from_job_data_list(original_models)
+        generated_rows = '\n'.join(email_gen.generate_text_rows_from_job_data_list(original_models))
 
-        self.assertFalse(bool(BeautifulSoup(generated_row, 'html.parser').find()))
+        self.assertFalse(bool(BeautifulSoup(generated_rows, 'html.parser').find()))
 
         for model in original_models:
             self.assertTrue(model.title in generated_rows)
