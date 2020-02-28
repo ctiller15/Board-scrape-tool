@@ -153,6 +153,16 @@ class TestDbInteractions(unittest.TestCase):
 
 class TestEmailGeneration(unittest.TestCase):
 
+    def test_generates_text_email_header(self):
+        current_date = date.today()
+
+        generated_header = email_gen.generate_text_email_header(current_date)
+
+        self.assertTrue(str(fh.days[current_date.weekday]) in generated_header)
+        self.assertTrue(str(current_date.day).strip() in generated_header)
+        self.assertTrue(str(current_date.month).strip() in generated_header)
+        self.assertTrue(str(current_date.year).strip() in generated_header)
+
     def test_text_email_generated_for_single_class(self):
         original_model = models.JobDataModel("title", "location", "url")
 
@@ -264,7 +274,6 @@ class TestFormatHelpers(unittest.TestCase):
         self.assertEqual(current_date.day, int(split_date[1].strip()))
         self.assertEqual(current_date.month, int(split_date[2].strip()))
         self.assertEqual(current_date.year, int(split_date[3].strip()))
-
 
 if __name__ == '__main__':
     unittest.main()
