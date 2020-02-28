@@ -4,7 +4,11 @@ def generate_text_email_header(date_obj):
     return f"Jobs for {fh.format_date(date_obj)}"
 
 def generate_text_row_from_job_data(JobDataModel):
-    pass
+    return f"""
+            Title: {JobDataModel.title}
+            Location: {JobDataModel.location}
+            Link: {JobDataModel.link}
+    """
 
 def generate_html_row_from_job_data(JobDataModel):
     return f"""
