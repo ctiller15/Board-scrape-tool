@@ -13,6 +13,17 @@ def generate_text_row_from_job_data(JobDataModel):
 def generate_text_rows_from_job_data_list(JobDataModels):
     return [generate_text_row_from_job_data(model) for model in JobDataModels]
 
+def generate_full_text_email(JobDataModels, date_obj):
+    job_rows = '\n'.join(generate_text_rows_from_job_data_list(JobDataModels))
+
+    return f"""
+        {generate_text_email_header(date_obj)}
+
+        {job_rows}
+
+        Powered by Job Scraper
+    """
+
 def generate_html_row_from_job_data(JobDataModel):
     return f"""
             <tr>
