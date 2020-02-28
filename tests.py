@@ -188,11 +188,13 @@ class TestEmailGeneration(unittest.TestCase):
             self.assertTrue(model.link in generated_rows)
 
     def test_creates_full_text_document(self):
+        date_obj = date.today()
+
         starter_models = [models.JobDataModel("cool job", "alberquerque", "coolurl.com/jobs/cool_job"),
                           models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
                           models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
 
-        generated_text = email_gen.generate_full_text_email(starter_models)
+        generated_text = email_gen.generate_full_text_email(starter_models, date_obj)
 
         for model in starter_models:
             self.assertTrue(model.location in generated_text)
@@ -235,11 +237,13 @@ class TestEmailGeneration(unittest.TestCase):
             self.assertEqual(original_models[i].link, url_elem['href'])
 
     def test_creates_full_html_email_document(self):
+        date_obj = date.today()
+
         starter_models = [models.JobDataModel("cool job", "alberquerque", "coolurl.com/jobs/cool_job"),
                           models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
                           models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
 
-        generated_html = email_gen.generate_full_html_email(starter_models)
+        generated_html = email_gen.generate_full_html_email(starter_models, date_obj)
 
         soup = BeautifulSoup(generated_html, 'html.parser')
         table_nested_rows = soup.find('tr').find('td').find('table').find_all('tr', recursive=False)

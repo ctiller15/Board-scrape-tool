@@ -20,7 +20,7 @@ def generate_html_row_from_job_data(JobDataModel):
 def generate_html_rows_from_job_data_list(JobDataModels):
     return [generate_html_row_from_job_data(model) for model in JobDataModels]
 
-def generate_full_html_email(JobDataModels):
+def generate_full_html_email(JobDataModels, date_obj):
     html_email_markup = f"""
         <!DOCTYPE html PUBLIC "-//W4C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
             <html xmlns="http://www.w3.org/1999/xhtml">
@@ -37,7 +37,7 @@ def generate_full_html_email(JobDataModels):
                                 <table align="center" border="1" cellpadding="0" cellspacing="0" width="600">
                                     <tr>
                                         <td class="header_content" align="center" style="padding: 20px">
-                                            <h2>Jobs for today, 05/23/1993</h2>
+                                            <h2>{generate_text_email_header(date_obj)}</h2>
                                         </td>
                                     </tr>
                                     <tr>
