@@ -274,7 +274,7 @@ class TestEmailGeneration(unittest.TestCase):
 
         # First, check all of the html to see if it is in order.
 
-        html_soup = BeautifulSoup(generated_email_content.html)
+        html_soup = BeautifulSoup(generated_email_content.html, 'html.parser')
 
         html_table_nested_rows = html_soup.find('tr').find('td').find('table').find_all('tr', recursive=False)
 
@@ -304,7 +304,7 @@ class TestEmailGeneration(unittest.TestCase):
 
         # Now, check that both the html and the raw text are similar in terms of content.
 
-        self.assertTrue(html_header_element.date in generated_text)
+        self.assertTrue(html_header_element.find('span', class_='date').text in generated_text)
 
 class TestFormatHelpers(unittest.TestCase):
 

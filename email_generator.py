@@ -1,7 +1,18 @@
 import format_helpers as fh
+from datetime import date
+
+class EmailContent(object):
+
+    def __init__(self, job_data_model_list):
+        self.date = date.today()
+        self.html = generate_full_html_email(job_data_model_list, self.date)
+        self.text = generate_full_text_email(job_data_model_list, self.date)
+
+def generate_full_email_content(job_data_model_list):
+    return EmailContent(job_data_model_list)
 
 def generate_text_email_header(date_obj):
-    return f"Jobs for {fh.format_date(date_obj)}"
+    return f"Jobs for <span class=\"date\">{fh.format_date(date_obj)}</span>"
 
 def generate_text_row_from_job_data(JobDataModel):
     return f"""
