@@ -265,6 +265,47 @@ class TestEmailGeneration(unittest.TestCase):
 
         self.assertTrue(footer_element.text.strip())
 
+    def test_creates_full_combined_email_text(self):
+        starter_models = [models.JobDataModel("cool job", "albania", "neatstuff.com/positions/crummy_job"),
+                          models.JobDataModel("dog trainer", "some city", "trainersfortrainers.com/trainers/animal_trainer"),
+                          models.JobDataModel("monster hunter", "bherna", "killbigstuff.com/jobs/hunt")]
+
+        generated_email_content = email_gen.generate_full_email_content(starter_models)
+
+        # First, check all of the html to see if it is in order.
+
+        html_soup = BeautifulSoup(generated_email_content.html)
+
+        html_table_nested_rows = html_soup.find('tr').find('td').find('table').find_all('tr', recursive=False)
+
+        self.assertEqual(len(html_table_nested_rows), 3)
+
+        html_header_element = html_table_nested_rows[0].find('td', class_='header_content')
+
+        html_body_element = html_table_nested_rows[1].find('td', class_='body_content')
+
+        html_footer_element = html_table_nested_rows[2].find('td', class_='footer_content')
+
+        self.assertTrue(html_header_element.text.strip())
+        self.assertEqual(len(html_body_element.find_all('td')), len(starter_models))
+
+        for elem in html_body_element.find_all('tr'):
+            self.assertTrue(elem.text.strip())
+
+        self.assertTrue(html_footer_element.text.strip())
+
+        # Now for the raw text checks.
+        generated_text = generated_email_content.text
+
+        for model in starter_models:
+            self.assertTrue(model.location in generated_text)
+            self.assertTrue(model.title in generated_text)
+            self.assertTrue(model.link in generated_text)
+
+        # Now, check that both the html and the raw text are similar in terms of content.
+
+        self.assertTrue(html_header_element.date in generated_text)
+
 class TestFormatHelpers(unittest.TestCase):
 
     def test_formats_datetime_for_Americas(self):

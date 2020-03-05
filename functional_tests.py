@@ -6,8 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from models import domain_db_mappings as dbm
 from models.database_models import JobDataDbModel
-from html_generator import generate_full_html_email
-
+from email_generator import generate_full_html_email
 
 Base = declarative_base()
 
@@ -92,7 +91,6 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
     def tearDown(self):
         Base.metadata.drop_all(self.engine)
 
-
     def test_emails_saved_job_data(self):
         # Larry is lazy. He doesn't want to have to keep checking everything himself, so
         # He wants the app to email him only results that haven't already been emailed to him yet.
@@ -117,7 +115,7 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         # His data is safely persisted in a database. Now he expects it to email itself to him.
 
-        generated_html_email = generate_full_html_email(saved_data)
+        generated_html_email = generate_full_email(saved_data)
 
         self.assertTrue(data.title in generated_html_email for data in saved_data)
         self.assertTrue(data.location in generated_html_email for data in saved_data)
