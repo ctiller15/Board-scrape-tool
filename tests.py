@@ -274,7 +274,7 @@ class TestEmailGeneration(unittest.TestCase):
 
         # First, check all of the html to see if it is in order.
 
-        html_soup = BeautifulSoup(generated_email_content.html, 'html.parser')
+        html_soup = BeautifulSoup(generated_email_content.html.to_string(), 'html.parser')
 
         html_table_nested_rows = html_soup.find('tr').find('td').find('table').find_all('tr', recursive=False)
 
@@ -295,7 +295,7 @@ class TestEmailGeneration(unittest.TestCase):
         self.assertTrue(html_footer_element.text.strip())
 
         # Now for the raw text checks.
-        generated_text = generated_email_content.text
+        generated_text = generated_email_content.text.to_string()
 
         for model in starter_models:
             self.assertTrue(model.location in generated_text)
