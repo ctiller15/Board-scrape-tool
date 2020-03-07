@@ -71,7 +71,7 @@ class TestSiteScraper(unittest.TestCase):
 
     def test_parsing_multiple_rows_with_empty_rows_returns_cleared_data(self):
         site = 'monster.com'
-        query = 'radiologist',
+        query = 'radiologist'
         location = 'New York'
 
         parsed_list = sh.parse_job_list(mixed_dummy_html_list)
@@ -177,21 +177,7 @@ class TestEmailGeneration(unittest.TestCase):
         self.assertTrue(str(current_date.month).strip() in generated_header_text)
         self.assertTrue(str(current_date.year).strip() in generated_header_text)
 
-    # Also redundant. Should be accounted for in following test.
-    def test_text_email_rows_generated_for_multiple_classes(self):
-        original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
-                           models.JobDataModel("title_02", "location_02", "url_02")]
-
-        generated_rows = '\n'.join(email_gen.generate_text_rows_from_job_data_list(original_models))
-
-        self.assertFalse(bool(BeautifulSoup(generated_rows, 'html.parser').find()))
-
-        for model in original_models:
-            self.assertTrue(model.title in generated_rows)
-            self.assertTrue(model.location in generated_rows)
-            self.assertTrue(model.link in generated_rows)
-
-    def test_creates_full_text_document(self):
+    def test_creates_full_email_body_text_content(self):
         date_obj = date.today()
 
         starter_models = [models.JobDataModel("cool job", "alberquerque", "coolurl.com/jobs/cool_job"),
@@ -200,12 +186,14 @@ class TestEmailGeneration(unittest.TestCase):
 
         generated_text = email_gen.generate_full_text_email(starter_models, date_obj)
 
+        self.assertFalse(bool(BeautifulSoup(generated_text, 'html.parser').find()))
+
         for model in starter_models:
             self.assertTrue(model.location in generated_text)
             self.assertTrue(model.title in generated_text)
             self.assertTrue(model.link in generated_text)
 
-    def test_html_email_generated_for_multiple_classes(self):
+    def test_creates_full_email_body_html_content(self):
         original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
                            models.JobDataModel("title_02", "location_02", "url_02")]
 
@@ -224,35 +212,6 @@ class TestEmailGeneration(unittest.TestCase):
             self.assertEqual(original_models[i].title, title_elem.text)
             self.assertTrue(original_models[i].location in location_elem.text)
             self.assertEqual(original_models[i].link, url_elem['href'])
-
-    def test_creates_full_html_email_document(self):
-        date_obj = date.today()
-
-        starter_models = [models.JobDataModel("cool job", "alberquerque", "coolurl.com/jobs/cool_job"),
-                          models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
-                          models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
-
-        generated_html = email_gen.generate_full_html_email(starter_models, date_obj)
-
-        soup = BeautifulSoup(generated_html, 'html.parser')
-        table_nested_rows = soup.find('tr').find('td').find('table').find_all('tr', recursive=False)
-
-        self.assertEqual(len(table_nested_rows), 3)
-
-        # Should contain a header, a body, and a footer
-        header_element = table_nested_rows[0].find('td', class_='header_content')
-
-        body_element = table_nested_rows[1].find('td', class_='body_content')
-
-        footer_element = table_nested_rows[2].find('td', class_='footer_content')
-
-        self.assertTrue(header_element.text.strip())
-        self.assertEqual(len(body_element.find_all('td')), len(starter_models))
-
-        for elem in body_element.find_all('tr'):
-            self.assertTrue(elem.text.strip())
-
-        self.assertTrue(footer_element.text.strip())
 
     def test_creates_full_combined_email_text(self):
         starter_models = [models.JobDataModel("cool job", "albania", "neatstuff.com/positions/crummy_job"),
