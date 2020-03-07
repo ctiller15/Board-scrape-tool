@@ -29,7 +29,7 @@ class TextEmailContent(EmailContent):
         self.generate_footer()
 
     def generate_header(self):
-        self.header = generate_text_email_header(self.date)
+        self.header = f"Jobs for {fh.format_date(self.date)}"
 
     def generate_body(self):
         self.body = generate_text_rows_from_job_data_list(self.job_data_list)
@@ -53,7 +53,7 @@ class HtmlEmailContent(EmailContent):
         self.generate_footer()
 
     def generate_header(self):
-        self.header = generate_html_email_header(self.date)
+        self.header = f"Jobs for <span class=\"date\">{fh.format_date(self.date)}</span>"
 
     def generate_body(self):
         self.body = generate_html_rows_from_job_data_list(self.job_data_list)
@@ -115,6 +115,7 @@ class FullEmailContent(object):
 def generate_full_email_content(job_data_model_list):
     return FullEmailContent(job_data_model_list)
 
+# TODO: Remove method
 def generate_text_email_header(date_obj):
     return f"Jobs for {fh.format_date(date_obj)}"
 

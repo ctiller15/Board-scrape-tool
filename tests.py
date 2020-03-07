@@ -156,12 +156,26 @@ class TestEmailGeneration(unittest.TestCase):
     def test_generates_text_email_header(self):
         current_date = date.today()
 
-        generated_header = email_gen.generate_text_email_header(current_date)
+        text_object = email_gen.TextEmailContent([], current_date)
+
+        generated_header = text_object.header
 
         self.assertTrue(str(fh.days[current_date.weekday()]) in generated_header)
         self.assertTrue(str(current_date.day).strip() in generated_header)
         self.assertTrue(str(current_date.month).strip() in generated_header)
         self.assertTrue(str(current_date.year).strip() in generated_header)
+
+    def test_generates_html_email_header(self):
+        current_date = date.today()
+
+        html_object = email_gen.HtmlEmailContent([], current_date)
+
+        generated_header_text = BeautifulSoup(html_object.header, 'html.parser').find('span', class_='date').text
+
+        self.assertTrue(str(fh.days[current_date.weekday()]) in generated_header_text)
+        self.assertTrue(str(current_date.day).strip() in generated_header_text)
+        self.assertTrue(str(current_date.month).strip() in generated_header_text)
+        self.assertTrue(str(current_date.year).strip() in generated_header_text)
 
     def test_text_email_generated_for_single_class(self):
         original_model = models.JobDataModel("title", "location", "url")
