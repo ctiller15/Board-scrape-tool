@@ -177,17 +177,7 @@ class TestEmailGeneration(unittest.TestCase):
         self.assertTrue(str(current_date.month).strip() in generated_header_text)
         self.assertTrue(str(current_date.year).strip() in generated_header_text)
 
-    def test_text_email_generated_for_single_class(self):
-        original_model = models.JobDataModel("title", "location", "url")
-
-        generated_row = email_gen.generate_text_row_from_job_data(original_model)
-
-        self.assertFalse(bool(BeautifulSoup(generated_row, 'html.parser').find()))
-
-        self.assertTrue(original_model.title in generated_row)
-        self.assertTrue(original_model.location in generated_row)
-        self.assertTrue(original_model.link in generated_row)
-
+    # Also redundant. Should be accounted for in following test.
     def test_text_email_rows_generated_for_multiple_classes(self):
         original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
                            models.JobDataModel("title_02", "location_02", "url_02")]
@@ -214,21 +204,6 @@ class TestEmailGeneration(unittest.TestCase):
             self.assertTrue(model.location in generated_text)
             self.assertTrue(model.title in generated_text)
             self.assertTrue(model.link in generated_text)
-
-    def test_html_email_generated_for_single_class(self):
-        original_model = models.JobDataModel("title", "location", "url")
-
-        generated_row = email_gen.generate_html_row_from_job_data(original_model)
-
-        soup = BeautifulSoup(generated_row, 'html.parser')
-
-        title_elem = soup.find('h3')
-        location_elem = soup.find('p')
-        url_elem = soup.find('a')
-
-        self.assertEqual(original_model.title, title_elem.text)
-        self.assertTrue(original_model.location in location_elem.text)
-        self.assertEqual(original_model.link, url_elem['href'])
 
     def test_html_email_generated_for_multiple_classes(self):
         original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
