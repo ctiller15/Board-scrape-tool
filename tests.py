@@ -184,7 +184,8 @@ class TestEmailGeneration(unittest.TestCase):
                           models.JobDataModel("thejobyoualwayswanted", "dreamland", "crystalshards.com/positions/king_position"),
                           models.JobDataModel("awesome position with great benefits", "awesomepositions.com/jobs/great_benefits_32_hour_work_week")]
 
-        generated_text = email_gen.generate_full_text_email(starter_models, date_obj)
+        # Confirming that it is, in fact, not html content
+        generated_text = email_gen.TextEmailContent(starter_models, date_obj).to_string()
 
         self.assertFalse(bool(BeautifulSoup(generated_text, 'html.parser').find()))
 
@@ -194,10 +195,12 @@ class TestEmailGeneration(unittest.TestCase):
             self.assertTrue(model.link in generated_text)
 
     def test_creates_full_email_body_html_content(self):
+        date_obj = date.today()
+
         original_models = [models.JobDataModel("title_01", "location_01", "url_01"),
                            models.JobDataModel("title_02", "location_02", "url_02")]
 
-        generated_rows = email_gen.generate_html_rows_from_job_data_list(original_models)
+        generated_rows = email_gen.HtmlEmailContent(original_models, date_obj).body
 
         for i in range(len(original_models)):
 
