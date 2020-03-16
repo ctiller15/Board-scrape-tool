@@ -6,7 +6,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from models import domain_db_mappings as dbm
 from models.database_models import JobDataDbModel
-from email_generator import generate_full_html_email
+from email_generator import TextEmailContent, HtmlEmailContent
+from datetime import date
 
 Base = declarative_base()
 
@@ -38,7 +39,7 @@ class TestScrapeMethods(unittest.TestCase):
         # Mary is a bit more discerning than Phil.
         # She wants to make sure her data makes sense.
 
-        query = 'radiologist'
+        query = 'doctor'
         location = 'New York'
         site = 'monster.com'
         location_names = ['New York', 'NY']
@@ -115,7 +116,7 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         # His data is safely persisted in a database. Now he expects it to email itself to him.
 
-        generated_html_email = generate_full_email(saved_data)
+        generated_html_email = HtmlEmailContent(saved_data, date.today()).to_string()
 
         self.assertTrue(data.title in generated_html_email for data in saved_data)
         self.assertTrue(data.location in generated_html_email for data in saved_data)
