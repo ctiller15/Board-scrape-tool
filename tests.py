@@ -257,6 +257,25 @@ class TestEmailGeneration(unittest.TestCase):
 
         self.assertTrue(html_header_element.find('span', class_='date').text in generated_text)
 
+    def test_creates_full_email_with_correct_content(self):
+        starter_models = [models.JobDataModel("cool job", "albania", "neatstuff.com/positions/crummy_job"),
+                          models.JobDataModel("dog trainer", "some city", "trainersfortrainers.com/trainers/animal_trainer"),
+                          models.JobDataModel("monster hunter", "bherna", "killbigstuff.com/jobs/hunt")]
+
+        generated_email_class = email_gen.generate_full_email_content(starter_models)
+
+        generated_email = generated_email_class.to_email()
+
+        self.assertEqual(generated_email_content.from_email, config.from_email)
+
+        self.assertEqual(generated_email_content.to_email, cfg.to_email)
+
+        self.assertTrue('job postings for', generated_email_content.subject)
+
+        self.assertTrue(generated_email_class.text in generated_email)
+        
+        self.assertTrue(generated_email_class.html in generated_email)
+
 class TestFormatHelpers(unittest.TestCase):
 
     def test_formats_datetime_for_Americas(self):
