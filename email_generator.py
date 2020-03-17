@@ -9,11 +9,14 @@ class EmailContent(object):
         self.body = ''
         self.footer = ''
 
+    def generate_row_from_job_data(self):
+        pass
+
     def generate_header(self):
         pass
 
     def generate_body(self):
-        pass
+        self.body = [self.generate_row_from_job_data(model) for model in self.job_data_list]
 
     def generate_footer(self):
         self.footer = 'Powered by Job Scraper'
@@ -28,11 +31,15 @@ class TextEmailContent(EmailContent):
         self.generate_body()
         self.generate_footer()
 
+    def generate_row_from_job_data(self, job_data_model):
+        return f"""
+                Title: {job_data_model.title}
+                Location: {job_data_model.location}
+                Link: {job_data_model.link}
+        """
+
     def generate_header(self):
         self.header = f"Jobs for {fh.format_date(self.date)}"
-
-    def generate_body(self):
-        self.body = generate_text_rows_from_job_data_list(self.job_data_list)
 
     def to_string(self):
         job_rows_combined = '\n'.join(self.body)
@@ -52,11 +59,19 @@ class HtmlEmailContent(EmailContent):
         self.generate_body()
         self.generate_footer()
 
+    def generate_row_from_job_data(self, job_data_model):
+        return f"""
+                <tr>
+                    <td>
+                        <h3 align="center">{job_data_model.title}</h3>
+                        <p align="center">Location:{job_data_model.location}</p>
+                        <p align="center"><span>Posting link:</span> <a href="{job_data_model.link}">link</a></p>
+                    </td>
+                </tr>
+        """
+
     def generate_header(self):
         self.header = f"Jobs for <span class=\"date\">{fh.format_date(self.date)}</span>"
-
-    def generate_body(self):
-        self.body = generate_html_rows_from_job_data_list(self.job_data_list)
 
     def to_string(self):
         return f"""
@@ -115,26 +130,4 @@ class FullEmailContent(object):
 def generate_full_email_content(job_data_model_list):
     return FullEmailContent(job_data_model_list)
 
-def generate_text_row_from_job_data(JobDataModel):
-    return f"""
-            Title: {JobDataModel.title}
-            Location: {JobDataModel.location}
-            Link: {JobDataModel.link}
-    """
 
-def generate_text_rows_from_job_data_list(JobDataModels):
-    return [generate_text_row_from_job_data(model) for model in JobDataModels]
-
-def generate_html_row_from_job_data(JobDataModel):
-    return f"""
-            <tr>
-                <td>
-                    <h3 align="center">{JobDataModel.title}</h3>
-                    <p align="center">Location:{JobDataModel.location}</p>
-                    <p align="center"><span>Posting link:</span> <a href="{JobDataModel.link}">link</a></p>
-                </td>
-            </tr>
-    """
-
-def generate_html_rows_from_job_data_list(JobDataModels):
-    return [generate_html_row_from_job_data(model) for model in JobDataModels]
