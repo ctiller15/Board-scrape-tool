@@ -1,12 +1,12 @@
 import unittest
 from bs4 import BeautifulSoup
-import get_html_script as ghs
+from src import get_html_script as ghs
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from models import domain_db_mappings as dbm
 from models.database_models import JobDataDbModel
-from email_generator import TextEmailContent, HtmlEmailContent
+from src.email_generator import TextEmailContent, HtmlEmailContent
 from datetime import date
 
 Base = declarative_base()

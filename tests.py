@@ -1,5 +1,5 @@
 import unittest
-import scrape_helpers as sh
+from src import scrape_helpers as sh
 from bs4 import BeautifulSoup
 from models import models
 from models.database_models import JobDataDbModel
@@ -7,9 +7,9 @@ from models import domain_db_mappings as dbm
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-import email_generator as email_gen
+from src import email_generator as email_gen
+from src import format_helpers as fh
 from datetime import date
-import format_helpers as fh
 
 Base = declarative_base()
 

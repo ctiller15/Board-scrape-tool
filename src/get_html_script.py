@@ -1,5 +1,5 @@
 import requests
-import scrape_helpers as sh
+from src import scrape_helpers as sh
 
 def scrape_site(site_name, query_text, location):
     url = sh.generate_request_url(site_name, query_text, location)

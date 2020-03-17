@@ -1,4 +1,4 @@
-import format_helpers as fh
+from src import format_helpers as fh
 from datetime import date
 
 class EmailContent(object):
