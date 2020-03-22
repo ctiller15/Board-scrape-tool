@@ -1,0 +1,5 @@
+[email]
+from_email = PLACEHOLDER_FROM_EMAIL
+from_email_password = PLACEHOLDER_PASSWORD
+to_email = PLACEHOLDER_TO_EMAIL
+

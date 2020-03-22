@@ -2,6 +2,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from src import format_helpers as fh
 from datetime import date
+from config import config as cfg
 
 class EmailContent(object):
     def __init__(self, job_data_model_list, date_obj):
@@ -132,15 +133,13 @@ class FullEmailContent(object):
     def to_email(self):
         message = MIMEMultipart("alternative")
         message["Subject"] = f"New job postings for {fh.format_date(self.date)}"
-        message["From"] = config.sender_email
-        message["To"] = config.receiver_email
-        text_part = MIMEText(self.text, "plain")
-        email_part = MIMEText(self.html, "html")
+        message["From"] = cfg.from_email
+        message["To"] = cfg.to_email
+        text_part = MIMEText(self.text.to_string(), "plain")
+        email_part = MIMEText(self.html.to_string(), "html")
         message.attach(text_part)
         message.attach(email_part)
         return message
 
 def generate_full_email_content(job_data_model_list):
     return FullEmailContent(job_data_model_list)
-
-

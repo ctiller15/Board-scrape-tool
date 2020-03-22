@@ -10,6 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from src import email_generator as email_gen
 from src import format_helpers as fh
 from datetime import date
+import config.config as cfg
 
 Base = declarative_base()
 
@@ -264,17 +265,17 @@ class TestEmailGeneration(unittest.TestCase):
 
         generated_email_class = email_gen.generate_full_email_content(starter_models)
 
-        generated_email = generated_email_class.to_email()
+        generated_email_content = generated_email_class.to_email()
 
-        self.assertEqual(generated_email_content.from_email, config.from_email)
+        self.assertEqual(generated_email_content['From'], cfg.from_email)
 
-        self.assertEqual(generated_email_content.to_email, cfg.to_email)
+        self.assertEqual(generated_email_content['To'], cfg.to_email)
 
-        self.assertTrue('job postings for', generated_email_content.subject)
+        self.assertTrue('job postings for' in generated_email_content['Subject'])
 
-        self.assertTrue(generated_email_class.text in generated_email)
+        self.assertTrue(generated_email_class.text.to_string() in generated_email_content.as_string())
         
-        self.assertTrue(generated_email_class.html in generated_email)
+        self.assertTrue(generated_email_class.html.to_string() in generated_email_content.as_string())
 
 class TestFormatHelpers(unittest.TestCase):
 
