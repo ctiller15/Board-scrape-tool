@@ -6,7 +6,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from models import domain_db_mappings as dbm
 from models.database_models import JobDataDbModel
-from src.email_generator import TextEmailContent, HtmlEmailContent
+from src.email_generator import TextEmailContent, HtmlEmailContent, generate_full_email_content
+from src.email_sender import send_email_to_user
 from datetime import date
 
 Base = declarative_base()
@@ -116,14 +117,12 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         # His data is safely persisted in a database. Now he expects it to email itself to him.
 
-        generated_html_email = HtmlEmailContent(saved_data, date.today()).to_string()
+        relevant_job_data = generate_full_email_content(saved_data)
 
-        self.assertTrue(data.title in generated_html_email for data in saved_data)
-        self.assertTrue(data.location in generated_html_email for data in saved_data)
-        self.assertTrue(data.link in generated_html_email for data in saved_data)
+        print(relevant_job_data)
 
         # The email has all of the expected data. It gets emailed to him.
-        send_email_to_user(generated_html_email, user_email)
+        send_email_to_user(relevant_job_data)
 
         # Larry has received the email after a short amount of time has passed.
         self.assertTrue(check_email_has_been_received())
