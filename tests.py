@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from src import email_generator as email_gen
 from src import format_helpers as fh
+import src.email_sender as ems
 from datetime import date
 import config.config as cfg
 
@@ -290,6 +291,18 @@ class TestFormatHelpers(unittest.TestCase):
         self.assertEqual(current_date.day, int(split_date[1].strip()))
         self.assertEqual(current_date.month, int(split_date[2].strip()))
         self.assertEqual(current_date.year, int(split_date[3].strip()))
+
+class TestSendEmailHelpers(unittest.TestCase):
+
+    def test_maps_email_to_correct_smtp_server(self):
+        tests = [
+                {'test@gmail.com', 'smtp.gmail.com'},
+                {'fake_email_9952@gmail.com', 'smtp.gmail.com'}
+            ]   
+
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(ems.get_smtp_server(value), expected)
 
 if __name__ == '__main__':
     unittest.main()
