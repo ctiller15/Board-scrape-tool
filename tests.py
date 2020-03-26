@@ -297,7 +297,12 @@ class TestSendEmailHelpers(unittest.TestCase):
     def test_maps_email_to_correct_smtp_server(self):
         tests = [
                 {'test@gmail.com', 'smtp.gmail.com'},
-                {'fake_email_9952@gmail.com', 'smtp.gmail.com'}
+                {'fake_email_9952@gmail.com', 'smtp.gmail.com'},
+                {'not_a_real_email@hotmail.com', 'smtp.live.com'},
+                {'sk8erb0ilives@live.com', 'smtp.live.com'},
+                {'thisisSuP3r0ld12345@msn.com', 'smtp.live.com'},
+                {'WeSti11m4keth3s3@passport.com', 'smtp.live.com'},
+                {'lolAsIf@passport.net', 'smtp.live.com'}
             ]   
 
         for value, expected in tests:
