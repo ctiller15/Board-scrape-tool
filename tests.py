@@ -167,7 +167,7 @@ class TestDbInteractions(unittest.TestCase):
 
         db_ops.mark_job_data_as_sent(self.session, saved_data)
 
-        updated_data = self.session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed == False)
+        updated_data = self.session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed == False).all()
 
         self.assertFalse(updated_data)
         
