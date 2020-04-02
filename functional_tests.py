@@ -40,7 +40,7 @@ class TestScrapeMethods(unittest.TestCase):
         # Mary is a bit more discerning than Phil.
         # She wants to make sure her data makes sense.
 
-        query = 'doctor'
+        query = 'developer'
         location = 'New York'
         site = 'monster.com'
         location_names = ['New York', 'NY']
@@ -119,17 +119,16 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         relevant_job_data = generate_full_email_content(saved_data)
 
-        print(relevant_job_data)
-
         # The email has all of the expected data. It gets emailed to him.
-        send_email_to_user(relevant_job_data)
+        response = send_email_to_user(relevant_job_data)
 
         # Larry has received the email after a short amount of time has passed.
-        self.assertTrue(check_email_has_been_received())
+        self.assertDictEqual(response, {})
 
+        db_ops.mark_job_data_as_sent(relevant_job_data)
         # All of the items that were sent are now marked as having been sent.
         # Because of this, none of them should show if we filter out sent items in the DB.
-        updated_data = session.query(JobDataDbModel).filter(sent)
+        updated_data = self.session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed == False).all()
         self.assertTrue(len(updated_data) == 0)
 
         # Satisfied that it works as expected, Larry goes to bed.

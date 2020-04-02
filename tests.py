@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from models import models
 from models.database_models import JobDataDbModel
 from models import domain_db_mappings as dbm
+import models.database_methods as db_ops
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -152,6 +153,24 @@ class TestDbInteractions(unittest.TestCase):
         for i in range(len(saved_data)):
             self.assertEqual(models[i].id, i + 1)
             self.assertTrue(models[i].__dict__ == saved_data[i].__dict__)
+
+    def test_flips_job_rows_having_been_emailed_to_true(self):
+        models = [JobDataDbModel(title='test_job_01', location='test_location_01', link='test_link_01', has_been_emailed=False),
+                  JobDataDbModel(title='test_job_02', location='test_location_02', link='test_link_02', has_been_emailed=False)]
+
+        for model in models:
+            self.session.add(model)
+
+        self.session.commit()
+
+        saved_data = self.session.query(JobDataDbModel).all()
+
+        db_ops.mark_job_data_as_sent(self.session, saved_data)
+
+        updated_data = self.session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed == False)
+
+        self.assertFalse(updated_data)
+        
 
 class TestEmailGeneration(unittest.TestCase):
 

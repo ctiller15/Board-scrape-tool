@@ -126,6 +126,7 @@ class HtmlEmailContent(EmailContent):
 class FullEmailContent(object):
 
     def __init__(self, job_data_model_list):
+        self.job_list = job_data_model_list
         self.date = date.today()
         self.html = HtmlEmailContent(job_data_model_list, self.date)
         self.text = TextEmailContent(job_data_model_list, self.date)

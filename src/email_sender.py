@@ -19,9 +19,12 @@ def send_email_to_user(generated_email_class):
     email_content = generated_email_class.to_email()
     smtp_server = get_smtp_server(email_content['From'])
    
-    print(smtp_server)
-
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(smtp_server, ssl_port, context=context) as server:
-        server.login(email_content['From'], cfg.from_email_password)
-        server.sendmail(email_content['From'], email_content['To'], email_content.as_string())
+        try:
+            server.login(email_content['From'], cfg.from_email_password)
+            response = server.sendmail(email_content['From'], email_content['To'], email_content.as_string())
+        except smtplib.SMTPResponseException as error:
+            print(f'An error occurred: {error}')
+
+    return response
