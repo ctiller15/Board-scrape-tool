@@ -122,37 +122,23 @@ class TestDbInteractions(unittest.TestCase):
             self.assertEqual(original_results[i].location, final_results[i].location)
             self.assertEqual(original_results[i].link, final_results[i].link)
 
-    def test_results_save_to_database(self):
-        model = JobDataDbModel(title="test_job", location="test_location", link="test_link", has_been_emailed=False)
-
-        self.session.add(model)
-        self.session.commit()
-
-        saved_data = self.session.query(JobDataDbModel).all()
-
-        self.assertEqual(len(saved_data), 1)
-
-        returned_row = saved_data[0]
-
-        self.assertEqual(model.id, 1)
-        self.assertTrue(model.__dict__ == returned_row.__dict__)
-
     def test_multiple_results_save_to_database(self):
-        models = [JobDataDbModel(title='test_job_01', location='test_location_01', link='test_link_01', has_been_emailed=False),
-                  JobDataDbModel(title='test_job_02', location='test_location_02', link='test_link_02', has_been_emailed=False)]
+        job_models = [models.JobDataModel(title='test_job_01', location='test_location_01', link='test_link_01'),
+                  models.JobDataModel(title='test_job_02', location='test_location_02', link='test_link_02')]
 
-        for model in models:
-            self.session.add(model)
-
-        self.session.commit()
+        db_ops.save_job_data(self.session, job_models)
 
         saved_data = self.session.query(JobDataDbModel).all()
 
-        self.assertEqual(len(saved_data), len(models))
+        self.assertEqual(len(saved_data), len(job_models))
+
+        mapped_models = dbm.map_job_data_models_to_db_models(job_models) 
 
         for i in range(len(saved_data)):
-            self.assertEqual(models[i].id, i + 1)
-            self.assertTrue(models[i].__dict__ == saved_data[i].__dict__)
+            self.assertEqual(mapped_models[i].title, saved_data[i].title)
+            self.assertEqual(mapped_models[i].location, saved_data[i].location)
+            self.assertEqual(mapped_models[i].link, saved_data[i].link)
+
 
     def test_flips_job_rows_having_been_emailed_to_true(self):
         models = [JobDataDbModel(title='test_job_01', location='test_location_01', link='test_link_01', has_been_emailed=False),
