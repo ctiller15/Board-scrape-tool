@@ -84,6 +84,31 @@ class TestScrapeMethods(unittest.TestCase):
 
         # Amazed at how far technology has come, a satisfied Mary goes to bed.
 
+class EndToEndHtmlScrapeSaveToDbTest(unittest.TestCase):
+    def setUp(self):
+        self.engine = create_engine('sqlite:///:memory:')
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+        Base.metadata.create_all(self.engine, tables=[JobDataDbModel.__table__])
+
+    def tearDown(self):
+        Base.metadata.drop_all(self.engine)
+
+    def test_scrapes_and_saves_job_data(self):
+        job_sites = ['monster.com']
+        location = 'utah'
+        query = 'hairdresser'
+
+        before_data = self.session.query(JobDataDbModel).all()
+
+        self.assertFalse(before_data)
+
+        ghs.scrape_sites_and_save_jobs(job_sites, query, location, self.session)
+
+        after_data = self.session.query(JobDataDbModel).all()
+
+        self.assertTrue(after_data)
+
 class StoresDataAndSendsEmailTest(unittest.TestCase):
     def setUp(self):
         self.engine = create_engine('sqlite:///:memory:')
