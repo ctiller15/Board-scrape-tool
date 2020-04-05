@@ -14,6 +14,8 @@ import src.email_sender as ems
 from datetime import date
 import config.config as cfg
 import uuid
+from crontab import CronTab
+import scheduleCron as sc
 
 Base = declarative_base()
 
@@ -29,26 +31,26 @@ empty_dummy_html_list = """<section class="card-content"></section>"""
 
 mixed_dummy_html_list = ["""<section class="card-content"></section>""",""" <section class="card-content"><h2 class="title">JobTitle</h2><div class="location">CoolLocation</div><a href="https://job-openings.monster.com/radiologist-body-imaging-brooklyn-ny-us-envision-physician-services-plantation-rsc/6bd5b9bb-f2af-4e9d-819a-0fd929ec8b33"></a></section>"""]
 
-class TestJobGeneration(unittest.TestCase):
+class TestCronJobGeneration(unittest.TestCase):
     def test_generates_crontab_task(self):
         cron_command = "test command."
 
         # Using a temp generated string to minimize the chance of conflicting with an existing comment.
         cron_comment = f'{uuid.uuid1()}'
 
-        pre_test_cron = Crontab(user=True)
+        pre_test_cron = CronTab(user=True)
 
         pre_job_comments = [job.comment for job in pre_test_cron]
 
-        self.assertTrue(comment not in pre_job_comments)
+        self.assertTrue(cron_comment not in pre_job_comments)
 
-        scheduleCron.generate_new_job(command, comment, time)
+        sc.generate_new_job(cron_command, cron_comment, date.today())
 
-        post_test_cron = Crontab(user=True)
+        post_test_cron = CronTab(user=True)
 
         post_job_comments = [job.comment for job in post_test_cron]
 
-        self.assertTrue(comment in post_job_comments)
+        self.assertTrue(cron_comment in post_job_comments)
 
         post_test_cron.remove_all(comment=cron_comment)
 
