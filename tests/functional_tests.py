@@ -11,6 +11,7 @@ import models.database_methods as db_ops
 from src.email_generator import TextEmailContent, HtmlEmailContent, generate_full_email_content
 from src.email_sender import send_email_to_user
 from datetime import date
+from cron_jobs import email_results
 
 Base = declarative_base()
 
@@ -140,9 +141,7 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         saved_data = self.session.query(JobDataDbModel).all()
 
-        self.assertEqual(len(class_data), len(saved_data))
-
-        # His data is safely persisted in a database. Now he expects it to email itself to him.
+        response = e_r.email_results_to_user(saved_data, self.session)
 
         relevant_job_data = generate_full_email_content(saved_data)
 
