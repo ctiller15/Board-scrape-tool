@@ -13,6 +13,7 @@ from src import format_helpers as fh
 import src.email_sender as ems
 from datetime import date
 import config.config as cfg
+import uuid
 
 Base = declarative_base()
 
@@ -27,6 +28,29 @@ dummy_html_blob = """<body><div id="ResultsContainer"><section class="card-conte
 empty_dummy_html_list = """<section class="card-content"></section>"""
 
 mixed_dummy_html_list = ["""<section class="card-content"></section>""",""" <section class="card-content"><h2 class="title">JobTitle</h2><div class="location">CoolLocation</div><a href="https://job-openings.monster.com/radiologist-body-imaging-brooklyn-ny-us-envision-physician-services-plantation-rsc/6bd5b9bb-f2af-4e9d-819a-0fd929ec8b33"></a></section>"""]
+
+class TestJobGeneration(unittest.TestCase):
+    def test_generates_crontab_task(self):
+        cron_command = "test command."
+
+        # Using a temp generated string to minimize the chance of conflicting with an existing comment.
+        cron_comment = f'{uuid.uuid1()}'
+
+        pre_test_cron = Crontab(user=True)
+
+        pre_job_comments = [job.comment for job in pre_test_cron]
+
+        self.assertTrue(comment not in pre_job_comments)
+
+        scheduleCron.generate_new_job(command, comment, time)
+
+        post_test_cron = Crontab(user=True)
+
+        post_job_comments = [job.comment for job in post_test_cron]
+
+        self.assertTrue(comment in post_job_comments)
+
+        post_test_cron.remove_all(comment=cron_comment)
 
 class TestSiteScraper(unittest.TestCase):
     def test_url_generation(self):
