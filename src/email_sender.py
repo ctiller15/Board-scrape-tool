@@ -1,5 +1,9 @@
 import smtplib, ssl
 from config import config as cfg
+from models.database_models import JobDataDbModel
+
+from src.email_generator import generate_full_email_content
+from models.database_methods import mark_job_data_as_sent
 
 ssl_port = 465
 
@@ -29,5 +33,10 @@ def send_email_to_user(generated_email_class):
 
     return response
 
-def get_data_and_send_email(job_data, db_session):
-    pass
+def get_data_and_send_email(db_session):
+    data = db_session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed==False).all()
+    email_content = generate_full_email_content(data)
+    response = send_email_to_user(email_content)
+    mark_job_data_as_sent(db_session, data)
+
+    return response

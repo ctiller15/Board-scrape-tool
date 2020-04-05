@@ -140,17 +140,11 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         saved_data = self.session.query(JobDataDbModel).all()
 
-        response = get_data_and_send_email(saved_data, self.session)
-
-        relevant_job_data = generate_full_email_content(saved_data)
-
-        # The email has all of the expected data. It gets emailed to him.
-        #response = send_email_to_user(relevant_job_data)
+        response = get_data_and_send_email(self.session)
 
         # Larry has received the email after a short amount of time has passed.
         self.assertDictEqual(response, {})
 
-        #db_ops.mark_job_data_as_sent(self.session, saved_data)
         # All of the items that were sent are now marked as having been sent.
         # Because of this, none of them should show if we filter out sent items in the DB.
         updated_data = self.session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed == False).all()
