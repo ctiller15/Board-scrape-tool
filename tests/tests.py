@@ -11,7 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from src import email_generator as email_gen
 from src import format_helpers as fh
 import src.email_sender as ems
-from datetime import date
+from datetime import date, time
 import config.config as cfg
 import uuid
 from crontab import CronTab
@@ -34,9 +34,8 @@ mixed_dummy_html_list = ["""<section class="card-content"></section>""",""" <sec
 class TestCronJobGeneration(unittest.TestCase):
     def test_generates_crontab_task(self):
         cron_command = "test command."
-
-        # Using a temp generated string to minimize the chance of conflicting with an existing comment.
         cron_comment = f'{uuid.uuid1()}'
+        schedule_time = time(12, 0, 0) 
 
         pre_test_cron = CronTab(user=True)
 
@@ -44,15 +43,17 @@ class TestCronJobGeneration(unittest.TestCase):
 
         self.assertTrue(cron_comment not in pre_job_comments)
 
-        sc.generate_new_job(cron_command, cron_comment, date.today())
+        sc.generate_new_job(cron_command, cron_comment, schedule_time)
 
         post_test_cron = CronTab(user=True)
 
         post_job_comments = [job.comment for job in post_test_cron]
-
         self.assertTrue(cron_comment in post_job_comments)
 
+        #teardown
+
         post_test_cron.remove_all(comment=cron_comment)
+        post_test_cron.write()
 
 class TestSiteScraper(unittest.TestCase):
     def test_url_generation(self):

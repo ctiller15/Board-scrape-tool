@@ -19,5 +19,3 @@ query_params = {}
 query_params['sitelist'] = config.get('query_params', 'target_sites').split(',')
 query_params['query_text'] = config.get('query_params', 'query_text')
 query_params['location'] = config.get('query_params', 'location')
-
-print(query_params)
