@@ -28,3 +28,6 @@ def send_email_to_user(generated_email_class):
             print(f'An error occurred: {error}')
 
     return response
+
+def get_data_and_send_email(job_data, db_session):
+    pass

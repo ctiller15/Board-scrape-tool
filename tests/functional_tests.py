@@ -9,9 +9,8 @@ from models import domain_db_mappings as dbm
 from models.database_models import JobDataDbModel
 import models.database_methods as db_ops
 from src.email_generator import TextEmailContent, HtmlEmailContent, generate_full_email_content
-from src.email_sender import send_email_to_user
+from src.email_sender import send_email_to_user, get_data_and_send_email
 from datetime import date
-from cron_jobs import email_results
 
 Base = declarative_base()
 
@@ -141,17 +140,17 @@ class StoresDataAndSendsEmailTest(unittest.TestCase):
 
         saved_data = self.session.query(JobDataDbModel).all()
 
-        response = e_r.email_results_to_user(saved_data, self.session)
+        response = get_data_and_send_email(saved_data, self.session)
 
         relevant_job_data = generate_full_email_content(saved_data)
 
         # The email has all of the expected data. It gets emailed to him.
-        response = send_email_to_user(relevant_job_data)
+        #response = send_email_to_user(relevant_job_data)
 
         # Larry has received the email after a short amount of time has passed.
         self.assertDictEqual(response, {})
 
-        db_ops.mark_job_data_as_sent(self.session, saved_data)
+        #db_ops.mark_job_data_as_sent(self.session, saved_data)
         # All of the items that were sent are now marked as having been sent.
         # Because of this, none of them should show if we filter out sent items in the DB.
         updated_data = self.session.query(JobDataDbModel).filter(JobDataDbModel.has_been_emailed == False).all()
