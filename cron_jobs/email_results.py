@@ -4,6 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from models.database_models import JobDataDbModel
 import os
 
+from src.email_sender import get_data_and_send_email
+
 Base = declarative_base()
 
 cur_dir = os.getcwd()
@@ -16,4 +18,4 @@ Session = sessionmaker(bind=engine)
 session = Session()
 Base.metadata.create_all(engine, tables=[JobDataDbModel.__table__])
 
-email_jobs_to_user(session)
+get_data_and_send_email(session)
