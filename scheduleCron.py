@@ -3,10 +3,10 @@ from datetime import time
 import os
 
 current_path = os.getcwd()
-cron_command = f'cd {current_path} && /usr/bin/python3 -m cron_jobs.scrape_sites'
+cron_command = f'cd {current_path} && /usr/bin/python3.6 -m cron_jobs.scrape_sites'
 cron_comment = 'job to run the job scraper daily'
 
-email_command = f'cd {current_path} && /usr/bin/python3 -m cron_jobs.email_results'
+email_command = f'cd {current_path} && /usr/bin/python3.6 -m cron_jobs.email_results'
 email_comment = 'job to email the stored results daily.'
 
 def generate_new_job(generator_command=cron_command, generator_comment=cron_comment, schedule_time=time(0, 0, 0)):
